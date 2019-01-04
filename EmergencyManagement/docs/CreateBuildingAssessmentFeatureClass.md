@@ -31,7 +31,7 @@ dashboards. The Zoning layer must share a unique id with the Tax Appraisal Layer
 3. **USNG Layer (Optional)** - POLYGON - A U.S. National Grid layer can be used to append the grid
 label to the USNGCoord field to aid in reporting.
 
-###Requirements
+### Requirements
 The tool output must be saved to a geodatabase that supports subtypes and domains.
 
 The tool output cannot be saved to a feature dataset. 
