@@ -19,13 +19,8 @@ The workflow in this script was derived by the City of Richardson's _Damage Asse
 Heather Scroggins.
 
 # USAGE
-###Requirements
-The tool output must be saved to a geodatabase that supports subtypes and domains.
 
-The tool output cannot be saved to a feature dataset. 
- 
-
-### Layers
+### Input Layers
 1. **Tax Appraisal Layer** - POLYGON - A layer containing the tax information for each parcel in the disaster
 area. At a mimimum, the layer should contain the tax value for the parcel _( The tax value is 
 multiplied by the percent damaged to calculate the value of damage )_ and a unique Parcel ID field.
@@ -34,8 +29,13 @@ Other useful fields include: Owner Name, Owner Contact, Owner Address, and Parce
 field. This is useful for summarizing affected parcels by zoning type in reports and operational 
 dashboards. The Zoning layer must share a unique id with the Tax Appraisal Layer. 
 3. **USNG Layer (Optional)** - POLYGON - A U.S. National Grid layer can be used to append the grid
-label to the USNGCoord field to aid in reporting.    
+label to the USNGCoord field to aid in reporting.
 
-### Script Setup
+###Requirements
+The tool output must be saved to a geodatabase that supports subtypes and domains.
 
+The tool output cannot be saved to a feature dataset. 
 
+There is no field mapping. The name of the fields in the tax appraisal layer must match exactly 
+the names of the fields in
+the `addFields` variable if the attributes from the tax appraisal layer are to be inherited.     
