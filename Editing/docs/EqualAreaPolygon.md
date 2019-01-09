@@ -1,6 +1,8 @@
 # Equal Area Polgyon
 Splits a polygon into two equal North South areas.
 
+![result](https://github.com/mebuie/mebuie.github.io/blob/master/img/github/EqualAreaPolygon.png)
+
 # USAGE
 
 ### Input
@@ -12,7 +14,7 @@ tolerance is met. Tolerance is calculated as ```polygon_X / polygon_Y = tolaranc
 is the split polygon with the lowest area and `polygon_Y` is the split polygon with the highest
 area. _The higher the tolerance the longer the processing time._
 
-![result](https://github.com/mebuie/mebuie.github.io/blob/master/img/github/EqualAreaPolygon.png)
+
 
 
    
