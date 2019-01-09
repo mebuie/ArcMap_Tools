@@ -2,6 +2,7 @@
 Splits a polygon into two equal North South areas.
 
 ![result](https://github.com/mebuie/mebuie.github.io/blob/master/img/github/EqualAreaPolygon.png)
+![result](https://github.com/mebuie/mebuie.github.io/blob/master/img/github/EqualAreaPolygon2.png)
 
 # USAGE
 
