@@ -129,7 +129,6 @@ def checkEquality(in_fc):
     :return: high_area DOUBLE the value of the polygon with the greatest area
     :return: low_area DOUBLE the value of the polygon with the lowest area
     """
-    #TODO: Check if more than two features?
 
     attributes = []
     cursor = arcpy.da.SearchCursor(in_fc, ["SHAPE@AREA", "SHAPE@XY"])
@@ -172,6 +171,7 @@ arcpy.env.workspace = 'in_memory'
 ########################################################################################################################
 
 # in_fc_copy: POLYGON The path to a copy of the user input feature class to be split
+# in_fc_copy_diss: POLYGON The path to the dissolve of in_fc_copy
 # in_fc_spatialref: SPATIAL REFERENCE The spatial reference of the input feature class. Needed for the create feature
 #   class parameter when creating feature class for polyline.
 # line_fc_path: STRING The path for the polyline feature class.
@@ -183,6 +183,7 @@ arcpy.env.workspace = 'in_memory'
 # tolerance_divider: INT the number to divide the tolerance by after each change of direction.
 
 in_fc_copy = r"in_memory\copy"
+in_fc_copy_diss = r'in_memory\copy_diss'
 in_fc_spatialref = arcpy.Describe(in_fc).spatialReference
 line_fc_path = r"in_memory"
 line_fc_filename = "split_line"
@@ -203,13 +204,14 @@ tolerance_divider = 10
 # features.
 arcpy.CopyFeatures_management(in_fc, in_fc_copy)
 
-# TODO: Check how many features there are and merge them into one if greater than one feature.
+# Dissolve all features into one feature.
+arcpy.Dissolve_management(in_fc_copy, in_fc_copy_diss)
 
 # Calculate the total area of features in the feature class.
-total_area = getArea(in_fc_copy)
+total_area = getArea(in_fc_copy_diss)
 
 # Get the extent of the feature class.
-x_max, x_min, y_max, y_min = getExtent(in_fc_copy)
+x_max, x_min, y_max, y_min = getExtent(in_fc_copy_diss)
 
 # calculate the coordinates of the bisecting line.
 start_x = x_max
@@ -233,7 +235,7 @@ while ratio <= tolerance:
     arcpy.FeatureToPolygon_management(line_fc, ftop_fc)
 
     # Clip the polygons with the original feature class
-    arcpy.Clip_analysis(ftop_fc, in_fc_copy, clip_fc)
+    arcpy.Clip_analysis(ftop_fc, in_fc_copy_diss, clip_fc)
 
     # Find the ratio of area between the two polygons and the direction we need to move the bisecting line to make them
     # equal.
