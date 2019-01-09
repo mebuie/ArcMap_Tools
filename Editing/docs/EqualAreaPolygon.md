@@ -10,6 +10,5 @@ has selected fields, only those fields are extracted and merged into one polygon
 2. **Tolerance** - DOUBLE - A value between 0 and 1. The tool will keep running until the desired
 tolerance is met. Tolerance is calculated as ```polygon_X / polygon_Y = tolarance``` where `polygon_X`
 is the split polygon with the lowest area and `polygon_Y` is the split polygon with the highest
-area. _Note, the closer the tolerance is to 1 the longer the processing time. The tolerance should never
-be more than 0.99999999_
+area.
    
