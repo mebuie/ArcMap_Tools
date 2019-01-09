@@ -1,4 +1,4 @@
-# Create Building Assessment Feature Class
+# Equal Area Polgyon
 Splits a polygon into two equal North South areas.
 
 # USAGE
@@ -11,6 +11,8 @@ has selected fields, only those fields are extracted and merged into one polygon
 tolerance is met. Tolerance is calculated as ```polygon_X / polygon_Y = tolarance``` where `polygon_X`
 is the split polygon with the lowest area and `polygon_Y` is the split polygon with the highest
 area. _The higher the tolerance the longer the processing time._
+
+![result](https://markbuie.com/img/github/EqualAreaPolygon.png)
 
 
    
