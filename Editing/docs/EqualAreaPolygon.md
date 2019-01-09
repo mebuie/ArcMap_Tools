@@ -12,7 +12,7 @@ tolerance is met. Tolerance is calculated as ```polygon_X / polygon_Y = tolaranc
 is the split polygon with the lowest area and `polygon_Y` is the split polygon with the highest
 area. _The higher the tolerance the longer the processing time._
 
-![result](https://markbuie.com/img/github/EqualAreaPolygon.png)
+![result](https://github.com/mebuie/mebuie.github.io/blob/master/img/github/EqualAreaPolygon.png)
 
 
    
