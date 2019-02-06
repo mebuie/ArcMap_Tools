@@ -485,6 +485,18 @@ addDomains = {
             "Yes": "Yes",
             "No": "No"
         }},
+    "EM_Placard": {
+        "fields": {
+            0: {"name": "Placard", "subtype": None}
+        },
+        "description": "Occupancy Placard for Building Services",
+        "field_type": "SHORT",
+        "domain_type": "CODED",
+        "domDict": {
+            "Green": "Yes",
+            "Yellow": "No",
+            "Red": "Red"
+        }},
     "EM_DmgAffected": {
         "fields": {
             0: {"name": "PercentLost", "subtype": "0"}
