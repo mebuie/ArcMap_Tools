@@ -430,7 +430,7 @@ addFields = {
     5: {'name': 'ACCOUNT_NUM', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 50, 'alias': 'Parcel Account', 'domain': None},
     6: {'name': 'DamageExtent', 'type': 'SHORT', 'precision': 5, 'scale': None, 'length': None, 'alias': 'Damage Extent', 'domain': None},
     7: {'name': 'PercentLost', 'type': 'SHORT', 'precision': 5, 'scale': None, 'length': None, 'alias': 'Damage Percent', 'domain': None},
-    8: {'name': 'Placard', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 10, 'alias': 'Placard', 'domain': None},
+    8: {'name': 'Placard', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 20, 'alias': 'Placard', 'domain': None},
     9: {'name': 'DamageDesc', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 500, 'alias': 'Description of Damage', 'domain': None},
     10: {'name': 'COMMENT', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 500, 'alias': 'Additional Comments', 'domain': None},
     11: {'name': 'BIZ_NAME', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 150, 'alias': 'Parcel Name', 'domain': None},
@@ -490,11 +490,12 @@ addDomains = {
             0: {"name": "Placard", "subtype": None}
         },
         "description": "Occupancy Placard for Building Services",
-        "field_type": "SHORT",
-        "domain_type": "TEXT",
+        "field_type": "TEXT",
+        "domain_type": "CODED",
         "domDict": {
-            "Green": "Yes",
-            "Yellow": "No",
+            "Not Assessed": "Not Assessed",
+            "Green": "Green",
+            "Yellow": "Yellow",
             "Red": "Red"
         }},
     "EM_DmgAffected": {
