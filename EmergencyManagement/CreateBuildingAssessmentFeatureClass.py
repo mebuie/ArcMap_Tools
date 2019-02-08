@@ -394,6 +394,20 @@ def updateFieldFromJoin(in_layer, in_field, join_layer, join_field, calc_field, 
     arcpy.RemoveJoin_management(in_layer)
 
 
+def isSDE(input_fc):
+    """
+    Returns true if a feature class is stored in an enterprise geodatabase.
+
+    :param input_fc: The input feature class to be checked
+    :return: boolean Returns true if feature class in enterprise geodatabase.
+    """
+    describe = arcpy.Describe(input_fc)
+    if describe.geometryStorage:
+        return True
+    else:
+        return False
+
+
 ########################################################################################################################
 #
 #                                               ENVIRONMENT SETTINGS
@@ -560,6 +574,7 @@ addDomains = {
 ########################################################################################################################
 
 
+
 # Create the feature class, hereafter called the BuildingAssessment feature class, and add the necessary fields that
 # will be used to evaluate parcel property damage. The resulting feature class will be published as a service for use in
 # Collector App and to display data in an Operational Dashboard.
@@ -638,6 +653,11 @@ if in_zone_layer:
     updateFieldFromJoin("in_memory\parcel", "ACCOUNT_NUM",
                         in_zone_layer, "ACCT_",
                         "FULL_ZONE", expression)
+
+# If the feature class was saved to an enterprise geodatabase, register the feature class as versioned so that it can
+# be edited.
+if isSDE(save_path):
+    arcpy.RegisterAsVersioned_management(save_path)
 
 ########################################################################################################################
 #
