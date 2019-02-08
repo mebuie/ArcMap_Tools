@@ -456,8 +456,8 @@ addFields = {
     31: {'name': 'SPTD_CODE', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 50, 'alias': 'SPTD Code', 'domain': None},
     32: {'name': 'DWEB_ACCT', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 200, 'alias': 'DCAD Account Link', 'domain': None},
     33: {'name': 'DWEB_HIST', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 200, 'alias': 'DCAD History Link', 'domain': None},
-    34: {'name': 'PROP_CLASS', 'type': 'LONG', 'precision': 10, 'scale': None, 'length': None, 'alias': 'Zoning Class', 'domain': None},
-    35: {'name': 'ZONE', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 10, 'alias': 'Zone', 'domain': None},
+    # 34: {'name': 'PROP_CLASS', 'type': 'LONG', 'precision': 10, 'scale': None, 'length': None, 'alias': 'Zoning Class', 'domain': None},
+    # 35: {'name': 'ZONE', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 10, 'alias': 'Zone', 'domain': None},
     36: {'name': 'FULL_ZONE', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 50, 'alias': 'Full Zone', 'domain': None},
     37: {'name': 'DAMAGE_CALC', 'type': 'DOUBLE', 'precision': 38, 'scale': 8, 'length': None, 'alias': 'Calculated Damage Value', 'domain': None},
 }
