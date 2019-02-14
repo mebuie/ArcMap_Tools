@@ -444,7 +444,7 @@ addFields = {
     5: {'name': 'ACCOUNT_NUM', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 50, 'alias': 'Parcel Account', 'domain': None},
     6: {'name': 'DamageExtent', 'type': 'SHORT', 'precision': 5, 'scale': None, 'length': None, 'alias': 'Damage Extent', 'domain': None},
     7: {'name': 'PercentLost', 'type': 'SHORT', 'precision': 5, 'scale': None, 'length': None, 'alias': 'Damage Percent', 'domain': None},
-    8: {'name': 'Placard', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 20, 'alias': 'Placard', 'domain': None},
+    8: {'name': 'Placard', 'type': 'SHORT', 'precision': 5, 'scale': None, 'length': None, 'alias': 'Damage Percent', 'domain': None},
     9: {'name': 'DamageDesc', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 500, 'alias': 'Description of Damage', 'domain': None},
     10: {'name': 'COMMENT', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 500, 'alias': 'Additional Comments', 'domain': None},
     11: {'name': 'BIZ_NAME', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 150, 'alias': 'Parcel Name', 'domain': None},
@@ -473,7 +473,7 @@ addFields = {
     # 34: {'name': 'PROP_CLASS', 'type': 'LONG', 'precision': 10, 'scale': None, 'length': None, 'alias': 'Zoning Class', 'domain': None},
     # 35: {'name': 'ZONE', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 10, 'alias': 'Zone', 'domain': None},
     36: {'name': 'FULL_ZONE', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 50, 'alias': 'Full Zone', 'domain': None},
-    37: {'name': 'DAMAGE_CALC', 'type': 'DOUBLE', 'precision': 38, 'scale': 8, 'length': None, 'alias': 'Calculated Damage Value', 'domain': None},
+    # 37: {'name': 'DAMAGE_CALC', 'type': 'DOUBLE', 'precision': 38, 'scale': 8, 'length': None, 'alias': 'Calculated Damage Value', 'domain': None},
 }
 
 subtypes = {
@@ -504,13 +504,13 @@ addDomains = {
             0: {"name": "Placard", "subtype": None}
         },
         "description": "Occupancy Placard for Building Services",
-        "field_type": "TEXT",
+        "field_type": "SHORT",
         "domain_type": "CODED",
         "domDict": {
-            "Not Assessed": "Not Assessed",
-            "Green": "Green",
-            "Yellow": "Yellow",
-            "Red": "Red"
+            "0": "Not Assessed",
+            "1": "Green",
+            "2": "Yellow",
+            "3": "Red"
         }},
     "EM_DmgAffected": {
         "fields": {
