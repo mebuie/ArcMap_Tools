@@ -444,7 +444,7 @@ addFields = {
     5: {'name': 'ACCOUNT_NUM', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 50, 'alias': 'Parcel Account', 'domain': None},
     6: {'name': 'DamageExtent', 'type': 'SHORT', 'precision': 5, 'scale': None, 'length': None, 'alias': 'Damage Extent', 'domain': None},
     7: {'name': 'PercentLost', 'type': 'SHORT', 'precision': 5, 'scale': None, 'length': None, 'alias': 'Damage Percent', 'domain': None},
-    8: {'name': 'Placard', 'type': 'SHORT', 'precision': 5, 'scale': None, 'length': None, 'alias': 'Damage Percent', 'domain': None},
+    8: {'name': 'Placard', 'type': 'SHORT', 'precision': 5, 'scale': None, 'length': None, 'alias': 'Placard', 'domain': None},
     9: {'name': 'DamageDesc', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 500, 'alias': 'Description of Damage', 'domain': None},
     10: {'name': 'COMMENT', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 500, 'alias': 'Additional Comments', 'domain': None},
     11: {'name': 'BIZ_NAME', 'type': 'TEXT', 'precision': None, 'scale': None, 'length': 150, 'alias': 'Parcel Name', 'domain': None},
@@ -658,6 +658,13 @@ if in_zone_layer:
 # be edited.
 if isSDE(save_path):
     arcpy.RegisterAsVersioned_management(save_path)
+
+# Add any default values to the feature class.
+cursor = arcpy.da.UpdateCursor("in_memory\parcel", ["Placard"])
+
+for row in cursor:
+    row[0] = "0"
+    cursor.updateRow(row)
 
 ########################################################################################################################
 #
