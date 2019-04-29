@@ -3,7 +3,7 @@
 IdentifyRecycleDateByAddress.py: Point in Polygon query for finding the Solid Waste collection date for a user
 defined address.
 
-This simple geoprocessing tool was used a proof of concept for the GIS departement.
+This simple geoprocessing tool was used as a proof of concept for the GIS departement.
 
 """
 
