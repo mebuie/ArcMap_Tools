@@ -1,6 +1,9 @@
 
 """
-IdentifyRecycleDateByAddress.py: Create a feature class to evaluate damage after a natural disaster.
+IdentifyRecycleDateByAddress.py: Point in Polygon query for finding the Solid Waste collection date for a user
+defined address.
+
+This simple geoprocessing tool was used a proof of concept for the GIS departement.
 
 """
 
@@ -22,24 +25,20 @@ import os
 addressLayer = arcpy.GetParameterAsText(0)
 recycleLayer = arcpy.GetParameterAsText(1)
 addressString = arcpy.GetParameterAsText(2)
-# # outFeature = arcpy.GetParameterAsText(3)
+
 
 ########################################################################################################################
 #
-#                                                  FUNCTIONS
-#
-########################################################################################################################
-
-########################################################################################################################
-#
-#                                               ENVIRONMENT SETTINGS
+#                                                  ENVIRONMENT SETTINGS
 #
 ########################################################################################################################
 
 output_path = arcpy.env.scratchGDB
+
+
 ########################################################################################################################
 #
-#                                                     VARIALBES
+#                                                  VARIALBES
 #
 ########################################################################################################################
 
@@ -53,22 +52,22 @@ output_fields = ['ADDRESS', 'FID_MESQ_GARB_ROTO_RECYCLE', 'FID_MESQ_ROTO_BOOM', 
                  'ROUTE', 'FID_MESQ_GARBAGE_COLLECTION', 'GCDAREA', 'FID_MESQ_RECYCLING',
                  'RCDAREA']
 
+
 ########################################################################################################################
 #
 #                                                  SCRIPT
 #
 ########################################################################################################################
 
-arcpy.AddMessage("creating address_lyr")
+# Query the address points using the user input parameters.
 address_lyr = arcpy.MakeFeatureLayer_management(addressLayer, "#", where_clause)
 
-arcpy.AddMessage("creating intersect")
 intersect = arcpy.Intersect_analysis([address_lyr, recycleLayer], "#")
 
-arcpy.AddMessage("creating intersect_lyr")
+# We need the intersect results to be a feature layer so we can apply the Field Info.
 intersect_lyr = arcpy.MakeFeatureLayer_management(intersect, "#")
 
-arcpy.AddMessage("removing unwated fields")
+# Create Field Info to hide unnecessary fields.
 desc = arcpy.Describe(intersect_lyr)
 arcpy.AddMessage(desc.dataType)
 field_info = desc.fieldInfo
@@ -76,17 +75,14 @@ for i in range(0, field_info.count):
     if field_info.getFieldName(i) not in output_fields:
         field_info.setVisible(i, "HIDDEN")
 
-arcpy.AddMessage("creating result_lyr")
+# Apply Field Info
 result_lyr = arcpy.MakeFeatureLayer_management(intersect_lyr, "#", "", "", field_info)
-#
-# arcpy.AddMessage("creating result_fc")
-# arcpy.CopyFeatures_management(result_lyr, "output")
 
+# Convert layer in to Feature Class.
 arcpy.FeatureClassToFeatureClass_conversion(result_lyr, output_path, "result_lyr")
 
-arcpy.AddMessage("generating output")
+# Tool output.
 arcpy.SetParameterAsText(3, os.path.join(output_path, "result_lyr"))
-
 
 
 ########################################################################################################################
