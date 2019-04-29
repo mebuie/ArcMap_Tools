@@ -3,6 +3,6 @@ This Python Tool is published as a Geoprocessing Service on ArcGIS Server. Once 
 made to the REST endpoint with the address in question. The results of the request are then published as a table,
 letting the end user know their garbage and recycling collection dates. 
 
-[Example](https://github.com/mebuie/mebuie.github.io/blob/master/img/github/SolidWasteCollection.gif) *Server subject to outages*
+[Example](http://markbuie.com/projects/solidwaste/) *Server subject to outages*
 
 ![result](https://github.com/mebuie/mebuie.github.io/blob/master/img/github/SolidWasteCollection.gif)
