@@ -1,17 +1,19 @@
 """
-AsbuiltLoator.py: Returns the Asbuilt sets from a corresponding feature.
+AsbuiltLoator.py: Returns the Asbuilt sets that overlap an input polygon.
 
-This geoprocessing tools returns the Asbuilt record sets that are associated with a GIS feature by querying the Asbuilt
-id of the feature and then using that id to query an Asbuilt database. This tools assumes that each digitized feature
-contains the asbuilt id of the source sheet and that all asbuilts in the set share a common prefix.
+This geoprocessing tools returns the Asbuilt record sets from features that overlap a user defined polygon.
+The tool relies on a unique asbuilt archive schema where the asbuilt that was used to digitize the feature is referenced
+as a field in the feature, and the asbuilt sets share a common id (see example 1).
 
 For this script, the id is contained in a hyperlink in the HYPERLINK field. To use the asbuilt id, it must first be
 isolated from the hyperlink using regex.
 
+Example 1:
+
 FEATURE ID
 001-1 (Digitized Source)
 
-ASBUILT DB ID (ARCHIVE)
+ASBUILT ID (ARCHIVE)
 001-1
 001-2
 001-3
@@ -22,13 +24,17 @@ ASBUILT DB ID (ARCHIVE)
 __author__ = "Mark Buie | GIS Coordinator | City of Mesquite"
 __maintainer__ = "Mark Buie"
 __email__ = "mbuie@cityofmesquite.com"
-__status__ = "Development"
+__status__ = "Production"
 
 import arcpy
 import os
 import zipfile
 import re
 import shutil
+import glob
+
+# TODO: TEST, Large file sizes could potentially bog down the server.
+# TODO: To save space on the server, the asbuilt directory should be deleted after the tool is finished.
 
 
 ########################################################################################################################
@@ -37,7 +43,17 @@ import shutil
 #
 ########################################################################################################################
 
-input_feature = arcpy.GetParameterAsText(0).strip("'")
+target_area = arcpy.GetParameterAsText(0)
+input_feature = arcpy.GetParameterAsText(1).split(";")
+
+
+########################################################################################################################
+#
+#                                                  VARIABLES
+#
+########################################################################################################################
+
+scratch_folder_path = arcpy.env.scratchFolder
 
 
 ########################################################################################################################
@@ -46,35 +62,97 @@ input_feature = arcpy.GetParameterAsText(0).strip("'")
 #
 ########################################################################################################################
 
+def clipFeatures(in_layers, focus_area):
+    output_features = []
+    count = 0
+    for layer in in_layers:
+        count += 1
+        layer = layer.strip("'")
+        # There is a bug with the clip tool where it will fail if the output name is too long...
+        result_name = os.path.join(arcpy.env.scratchGDB, "lyr" + str(count))
+        output_features.append(result_name)
+        arcpy.Clip_analysis(layer, focus_area, result_name)
 
-def zipdir(path, ziph):
+    return output_features
+
+
+def asbuiltHyperlinkToUNC(in_layer, unc_path):
+    # The HYPERLINK field can be mixed case depending on the layer. Let's find the correct case.
+    # TODO: I have not tested if SearchCursor inputs are case sensitive, so this may not be necessary.
+    hyperlink_field = ""
+    fields = arcpy.ListFields(in_layer)
+    for field in fields:
+        if field.name.upper() == "HYPERLINK":
+            hyperlink_field = field.name
+
+    # Let's get all the unique asbuilt unc paths.
+    regex_url_expression = "asbuilts/([A-z0-9./ -]*)\""
+    asbuilt_unc_paths = []
+    with arcpy.da.SearchCursor(in_layer, hyperlink_field, hyperlink_field + " IS NOT NULL", sql_clause=("DISTINCT", None)) as cursor:
+
+        for row in cursor:
+            # Remove the suffix of the html link.
+            regex_url_result = re.search(regex_url_expression, row[0])
+            # Replace with UNC path.
+            if regex_url_result:
+                asbuilt_file_path = os.path.join(unc_path, regex_url_result.group(1))
+                asbuilt_unc_paths.append(asbuilt_file_path)
+
+    return asbuilt_unc_paths
+
+
+def getAsbuiltSetPaths(full_asbuilt_paths):
+    asbuilt_set_paths = []
+    # Remove the asbuilt file suffix -001, 002, etc.
+    for path in full_asbuilt_paths:
+        set_path = path.rsplit("-", 1)[0]
+        asbuilt_set_paths.append(set_path)
+
+    return asbuilt_set_paths
+
+def getAsbuilts(asbuilt_paths, save_path):
+    for asbuilt_path in asbuilt_paths:
+        set_name = asbuilt_path.rsplit("/", 1)[-1]
+
+        arcpy.AddMessage("Preparing asbuilts for {0}".format(set_name))
+
+        set_folder = os.path.join(save_path, set_name)
+        if not os.path.exists(set_folder):
+            os.mkdir(os.path.join(set_folder))
+
+        asbuilt_images = glob.glob(asbuilt_path + '*.TIF*')
+        for image in asbuilt_images:
+            if os.path.isfile(image):
+                shutil.copy2(image, os.path.join(set_folder))
+            else:
+                arcpy.AddWarning("No file found for {0}".format(image))
+
+
+def zip_folder(folder_path, output_path):
+    """Zip the contents of an entire folder (with that folder included
+    in the archive). Empty subfolders will be included in the archive
+    as well.
+    
+    Modified from:
+    https://www.calazan.com/how-to-zip-an-entire-directory-with-python/
     """
-    Zips files in path to the ziph.zip
+    parent_folder = os.path.dirname(folder_path)
+    # Retrieve the paths of the folder contents.
+    contents = os.walk(folder_path)
 
-    :param path: The folder path to files to be zipped.
-    :param ziph: The ZipFile object.
-    :return: Void
-    """
-    # ziph is zipfile handle
-    for root, dirs, files in os.walk(path):
+    zip_file = zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED)
+    for root, folders, files in contents:
+        # Include all subfolders, including empty ones.
+        for folder_name in folders:
+            absolute_path = os.path.join(root, folder_name)
+            relative_path = absolute_path.replace(parent_folder + '\\', '')
+            zip_file.write(absolute_path, relative_path)
+        for file_name in files:
+            absolute_path = os.path.join(root, file_name)
+            relative_path = absolute_path.replace(parent_folder + '\\', '')
+            zip_file.write(absolute_path, relative_path)
 
-        for file in files:
-            arcpy.AddMessage(file)
-            ziph.write(
-                os.path.join(root, file),
-                os.path.join("asbuilts", file)
-            )
-
-########################################################################################################################
-#
-#                                                  VARIABLES
-#
-########################################################################################################################
-
-asbuilt_id_field = 'HYPERLINK'
-regex_url_expression = "asbuilts/([A-z0-9./ -]*)\""
-asbuilt_folder_path = r"\\fps-777-3.cityofmesquite.com\engineering\Asbuilts"
-scratch_folder_path = arcpy.env.scratchFolder
+    zip_file.close()
 
 ########################################################################################################################
 #
@@ -82,56 +160,45 @@ scratch_folder_path = arcpy.env.scratchFolder
 #
 ########################################################################################################################
 
-
-# Let's first create some directories to organize our data. These folders will be created in the scratch directory
-# of the geoprocessing job folder.
+# Let's create a directory to store the asbuilts. This directory will zipped and provided to the user.
 asbuilt_folder = os.path.join(scratch_folder_path, "asbuilts")
-
+# The scratch directory is gauranteed to be empty, so this isn't really needed as a geoprocessing services. However,
+# it is useful for debugging purposes within ArcMap.
 if not os.path.exists(asbuilt_folder):
     os.mkdir(os.path.join(scratch_folder_path, "asbuilts"))
 
-# arcpy.AddMessage(input_feature)
 
-# Create a list of the fields in the feature class so we can check if it has the correct ones.
-list_fields = [str.upper(str(field.name)) for field in arcpy.ListFields(input_feature)]
+# Clip the line features to the user defined project area.
+clipped_features = clipFeatures(input_feature, target_area)
 
-# If the feature class has a HYPERLINK field, it's the fields we need.
-if asbuilt_id_field in list_fields:
-    with arcpy.da.SearchCursor(input_feature, asbuilt_id_field, "HYPERLINK IS NOT NULL", sql_clause=("DISTINCT", None)) as cursor:
-        for row in cursor:
-            regex_url_result = re.search(regex_url_expression, row[0])
-            if regex_url_result:
 
-                regex_file_expression = r"/([0-9A-z]*-[A-z0-9]*-[A-z0-9-.]*[A-z]*)"
-                regex_file_result = re.search(regex_file_expression, regex_url_result.group(1))
+# Get all the paths to the asbuilt sheets that were used to digitize the feature.
+asbuilt_paths = []
+asbuilt_folder_path = r"\\fps-777-3.cityofmesquite.com\engineering\Asbuilts"
+for feature in clipped_features:
+    asbuilt_paths += asbuiltHyperlinkToUNC(feature, asbuilt_folder_path)
 
-                # arcpy.AddMessage(regex_url_result.group(1))
 
-                asbuilt_file_path = os.path.join(asbuilt_folder_path, regex_url_result.group(1))
+# Get the paths of the asbuilt sets by removing the the suffix from the asbuilt sheets.
+asbuilt_set_paths = getAsbuiltSetPaths(asbuilt_paths)
 
-                if os.path.isfile(asbuilt_file_path):
-                    shutil.copy2(asbuilt_file_path, os.path.join(asbuilt_folder, regex_file_result.group(1)))
-                else:
-                    arcpy.AddWarning("No file found for {0}".format(regex_file_result.group(1)))
 
-# Create an empty zip file
-zipf = zipfile.ZipFile(
-    os.path.join(scratch_folder_path, "asbuilt_output.zip"),
-    "w",
-    zipfile.ZIP_DEFLATED)
+# Now that we know what asbuilt set the feature belongs to, we cant retrieve them from the asbuilt database.
+getAsbuilts(asbuilt_set_paths, asbuilt_folder)
 
-# Populate zip file with asbuilts
-zipdir(
+
+# Zip the results
+# TODO: Check if results were returned to prevent empty zip file.
+arcpy.AddMessage("Zipping files...")
+zip_folder(
     os.path.join(scratch_folder_path, "asbuilts"),
-    zipf)
+    os.path.join(scratch_folder_path, "asbuilt_output.zip")
+)
 
-# Close zip.
-zipf.close()
-
-#TODO: Check if results were returned to prevent empty zip file.
 
 # Return the results of the geoprocessing tool as a zip file.
-arcpy.SetParameterAsText(1, os.path.join(scratch_folder_path, "asbuilt_output.zip"))
+arcpy.SetParameterAsText(2, os.path.join(scratch_folder_path, "asbuilt_output.zip"))
+
 
 ########################################################################################################################
 #
