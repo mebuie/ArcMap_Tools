@@ -2,8 +2,8 @@
 A collection of custom geoprocessing tools developed for ArcMap 10.
 
 # USAGE
-Each folder contains an ArcMap Toolbox with the required python script preloaded. Simply downloaded
-the toolbox, navigate to the toolbox location within ArcCatalog and use the custome geoprocessing
+Each folder contains an ArcMap Toolbox with the required python script preloaded. Simply download
+the toolbox, navigate to the toolbox location within ArcCatalog and use the custom geoprocessing
 tool like any other ArcMap tool. 
 
 Most of these tools have been created to perform a niche task with schema unique to the
